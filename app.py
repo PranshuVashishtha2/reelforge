@@ -10,17 +10,19 @@ BASE         = os.path.dirname(os.path.abspath(__file__))
 DOWNLOAD_DIR = os.path.join(BASE, 'downloads')
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+download_progress = {}
+
 def keep_alive():
-    """Ping self every 10 mins to prevent Render free tier sleep"""
+    """Ping self every 10 mins to prevent sleep"""
     import urllib.request
-    time.sleep(60)  # wait for server to fully start first
+    time.sleep(60)
     while True:
         try:
-            url = os.environ.get('RENDER_EXTERNAL_URL', '')
+            url = os.environ.get('RAILWAY_STATIC_URL') or os.environ.get('RENDER_EXTERNAL_URL', '')
             if url:
-                urllib.request.urlopen(f'{url}/api/health', timeout=10)
+                urllib.request.urlopen(f'https://{url}/api/health', timeout=10)
         except: pass
-        time.sleep(600)  # every 10 minutes
+        time.sleep(600)
 
 threading.Thread(target=keep_alive, daemon=True).start()
 
